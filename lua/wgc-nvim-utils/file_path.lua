@@ -1,4 +1,4 @@
-utils = require('wgc-nvim-utils.utils')
+local utils = require('wgc-nvim-utils.utils')
 
 local constants = utils.table.protect {
   SEP = package.config:sub(1,1),
