@@ -2,12 +2,11 @@ utils = require('wgc-nvim-utils.utils')
 
 local constants = utils.table.protect {
   SEP = package.config:sub(1,1),
-  TYPE = "__WGC__FP__",
   DIR_TYPE = "directory",
   FILE_TYPE = "file",
 }
 
-local M = {[constants.TYPE] = constants.TYPE}
+local M = {}
 
 M.__index = M
 
@@ -28,7 +27,7 @@ local regexes = utils.table.protect {
 local function verify(...)
   local verified = ... and true
   for _,fp in ipairs{...} do
-    verified = verified and fp[constants.TYPE] == constants.TYPE
+    verified = verified and getmetatable(fp) == M
   end
   return verified
 end
