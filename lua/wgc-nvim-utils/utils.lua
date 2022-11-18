@@ -7,7 +7,8 @@ local protect = function(tbl)
     __index = tbl,
     __newindex = function(t,k,v)
       error(string.format("Attempting to change constant '%s' to %s",k,v))
-    end
+    end,
+    __metatable = "Not Allowed",
   })
 end
 
