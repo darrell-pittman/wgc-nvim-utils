@@ -5,7 +5,7 @@ local unpack = table.unpack or unpack
 local protect = function(tbl)
   return setmetatable({}, {
     __index = tbl,
-    __newindex = function(t,k,v)
+    __newindex = function(_,k,v)
       error(string.format("Attempting to change constant '%s' to %s",k,v))
     end,
     __metatable = "Not Allowed",
@@ -18,6 +18,13 @@ M.constants = protect({
 })
 
 M.string = {
+  center= function(str, width)
+    local padding = math.floor((width - string.len(str))/2)
+    return M.string.pad(str, padding)
+  end,
+  pad = function(str, n)
+    return string.rep(' ',n)..str
+  end,
   is_empty = function(s)
     return (not s) or (string.len(s) == 0)
   end,
