@@ -182,10 +182,6 @@ Some utils for string, tables and also helpers for nvim options and key mapping.
 Returns true is str is nil or string.len(str) = 0
 #### empty_val(str, val)
 Returns str if str is not empty, otherwise returns val
-#### trim(str)
-Returns str with whitespace trimmed from both ends
-#### split(str,regex)
-Returns table of str split by regex
 
 ### table submodule
 #### append(tb1, ...)
@@ -209,14 +205,6 @@ local utils=require('wgc-nvim-utils').utils
 local tb1 = {1,2,3}
 local popped, tb2 = utils.table.pop(tb1)
 -- Here tb1 = {1,2,3}, tb2 = {1,2} and popped = 3
-```
-#### slice(tbl, start, _end)
-Returns new table which is a slice of tbl from start to end
-```lua
-local utils=require('wgc-nvim-utils').utils
-local tb1 = {1,2,3,4,5}
-local tb2 = utils.table.slice(tb1,2,4)
--- Here tb1 = {1,2,3,4,5} and tb2 = {2,3,4}
 ```
 
 #### protect(tbl)

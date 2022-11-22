@@ -14,7 +14,6 @@ end
 
 M.constants = protect({
   HOME = vim.env.HOME,
-  TRIM = "^[%s%c\n]*(.*[^%s%c\n])[%s%c\n]*$",
 })
 
 M.string = {
@@ -31,39 +30,24 @@ M.string = {
   empty_val = function(s,v)
     return M.string.is_empty(s) and v or s
   end,
-  trim = function(s)
-    return s:match(M.constants.TRIM)
-  end,
-  split = function(s,r)
-    local vals = {}
-    for val in string.gmatch(s,r) do
-      table.insert(vals, val)
-    end
-    return vals
-  end,
 }
-
-local function slice(tbl, start, _end)
-  return {unpack(tbl, start,_end)}
-end
 
 local function pop(tbl)
   if not tbl then return end
   if #tbl > 0 then
     local popped = tbl[#tbl]
-    return popped, slice(tbl,1,#tbl -1)
+    return popped, vim.list_slice(tbl, 1, #tbl -1)
   end
 end
 
 M.table = {
   protect = protect,
-  slice = slice,
   pop = pop,
   append = function(tbl1, ...)
     local tbls = {...}
     if tbls and #tbls > 0 then
       local tbl = tbls[1]
-      tbls = M.table.slice(tbls, 2,#tbls)
+      tbls = vim.list_slice(tbls, 2,#tbls)
       for _,v in ipairs(tbl) do
         table.insert(tbl1, v)
       end

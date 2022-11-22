@@ -15,8 +15,6 @@ M.__eq = function(fp1, fp2)
 end
 
 local regexes = utils.table.protect {
-  TRIM_SEP = ("^(.+)%s$"):format(constants.SEP),
-  SPLIT_PATH = ("([^%s]+)"):format(constants.SEP),
   ROOTS = {
     constants.SEP == "/" and ("^(%s)"):format(constants.SEP) or ("^([A-Za-z]:%s)"):format(constants.SEP),
     constants.SEP == "\\" and ("^(%s%s)"):format(constants.SEP, constants.SEP),
@@ -76,16 +74,18 @@ function M:new(path, root)
     end
   elseif path_type == "string" then
     --trim whitespace
-    path = utils.string.trim(path)
+    path = vim.trim(path)
 
     --trim trailing /
-    path = path:match(regexes.TRIM_SEP) or path
+    while path and vim.endswith(path, constants.SEP) do
+      path = path:sub(1, #path - 1)
+    end
 
     root = parse_root(path)
     if root then
-      path = path:sub(#root,#path)
+      path = path:sub(#root + 1, #path)
     end
-    path = utils.string.split(path, regexes.SPLIT_PATH)
+    path = vim.split(path, constants.SEP)
   else
     error("Invalid path")
   end
