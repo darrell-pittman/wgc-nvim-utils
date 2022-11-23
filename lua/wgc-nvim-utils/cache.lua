@@ -4,12 +4,12 @@ local M = {}
 M.__index = M
 
 local constants = utils.table.protect {
-  NO_VALUE = "__WGC_NO_VALUE__"
+  NO_VALUE = '__WGC_NO_VALUE__'
 }
 
 local function verify_key(key)
   if utils.string.is_empty(key) then
-    error("Key is required")
+    error('Key is required')
   end
 end
 

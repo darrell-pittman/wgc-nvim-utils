@@ -2,8 +2,8 @@ local utils = require('wgc-nvim-utils.utils')
 
 local constants = utils.table.protect {
   SEP = package.config:sub(1,1),
-  DIR_TYPE = "directory",
-  FILE_TYPE = "file",
+  DIR_TYPE = 'directory',
+  FILE_TYPE = 'file',
 }
 
 local M = {}
@@ -16,10 +16,10 @@ end
 
 local regexes = utils.table.protect {
   ROOTS = {
-    constants.SEP == "/" and ("^(%s)"):format(constants.SEP) or ("^([A-Za-z]:%s)"):format(constants.SEP),
-    constants.SEP == "\\" and ("^(%s%s)"):format(constants.SEP, constants.SEP),
+    constants.SEP == '/' and ('^(%s)'):format(constants.SEP) or ('^([A-Za-z]:%s)'):format(constants.SEP),
+    constants.SEP == '\\' and ('^(%s%s)'):format(constants.SEP, constants.SEP),
   },
-  EXTENSION = "^%.*.*%.([^%s]+)$",
+  EXTENSION = '^%.*.*%.([^%s]+)$',
 }
 
 local function verify(...)
@@ -33,16 +33,16 @@ end
 local function concat(fp1, fp2)
   if verify(fp1, fp2) then
     if fp2:is_absolute() then
-      error("fp2 must be relative")
+      error('fp2 must be relative')
     end
     return M:new(utils.table.append({},fp1.path,fp2.path), fp1.root)
   else
-    error("Error: file_path can only concat another file_path")
+    error('Error: file_path can only concat another file_path')
   end
 end
 
 M.__tostring = function(fp)
-  return (fp.root or "")..table.concat(fp.path, constants.SEP)
+  return (fp.root or '')..table.concat(fp.path, constants.SEP)
 end
 
 M.__add = concat
@@ -67,12 +67,12 @@ end
 function M:new(path, root)
   local path_type = type(path)
 
-  if path_type == "table" then
+  if path_type == 'table' then
     if verify(path) then
       root = path.root
       path = path.path
     end
-  elseif path_type == "string" then
+  elseif path_type == 'string' then
     --trim whitespace
     path = vim.trim(path)
 
@@ -87,7 +87,7 @@ function M:new(path, root)
     end
     path = vim.split(path, constants.SEP)
   else
-    error("Invalid path")
+    error('Invalid path')
   end
 
   return setmetatable({path = path, root = root},self)
@@ -164,7 +164,7 @@ function M:search_up(name, callback)
 end
 
 function M:read(callback)
-  vim.loop.fs_open(tostring(self), "r", 438, function(err, fd)
+  vim.loop.fs_open(tostring(self), 'r', 438, function(err, fd)
     assert(not err, err)
     vim.loop.fs_fstat(fd, function(err, stat)
       assert(not err, err)
