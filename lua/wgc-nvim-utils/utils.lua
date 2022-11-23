@@ -1,7 +1,5 @@
 local M = {}
 
-local unpack = table.unpack or unpack
-
 local protect = function(tbl)
   return setmetatable({}, {
     __index = tbl,
@@ -27,6 +25,9 @@ M.string = {
   is_empty = function(s)
     return (not s) or (string.len(s) == 0)
   end,
+  is_not_empty = function(s)
+    return not M.string.is_empty(s)
+  end,
   empty_val = function(s,v)
     return M.string.is_empty(s) and v or s
   end,
@@ -36,7 +37,7 @@ local function pop(tbl)
   if not tbl then return end
   if #tbl > 0 then
     local popped = tbl[#tbl]
-    return popped, vim.list_slice(tbl, 1, #tbl -1)
+    return popped, vim.list_slice(tbl, 1, #tbl - 1)
   end
 end
 
