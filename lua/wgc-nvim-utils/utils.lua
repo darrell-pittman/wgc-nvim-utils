@@ -71,22 +71,8 @@ M.make_mapper = function(key)
     end
   end
 
-  local buffer = options.buffer
-  options.buffer = nil
-
-  local map_fn = buffer and vim.api.nvim_buf_set_keymap or vim.api.nvim_set_keymap
-
   return function(mode, lhs, rhs)
-    local args = {
-      mode,
-      lhs,
-      rhs,
-      options,
-    }
-    if buffer then
-      table.insert(args, 1, buffer)
-    end
-    map_fn(unpack(args))
+    vim.keymap.set(mode, lhs, rhs, options)
   end
 end
 
