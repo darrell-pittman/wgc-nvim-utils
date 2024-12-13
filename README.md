@@ -184,19 +184,26 @@ Returns true is str is nil or string.len(str) = 0
 Returns str if str is not empty, otherwise returns val
 
 ### table submodule
-#### append(tb1, ...)
-Appends tables to tb1. Returns modified tb1.
+#### append(...)
+Accepts varargs of array-like tables and
+non-destructively appends them tables together
 ```lua
 local utils=require('wgc-nvim-utils').utils
-local tb1 = {1,2,3}
-utils.table.append(tb1,{4,5},{6})
--- tb1 = {1,2,3,4,5,6}
+t = utils.table.append({1,2,3},{4,5},{6})
+-- t = {1,2,3,4,5,6}
+```
+#### merge(...)
+Accepts varargs of map-like tables and
+non-destructively merges them tables together
 
--- Note
--- If you don't want to modify tb1 you can do this
-tb1 = {1,2,3}
-local tb2 utils.table.append({},tb1,{4,5})
--- Here tb1 = {1,2,3} and tb2 = {1,2,3,4,5}
+Note: 
+  Values in later tables overwrite values in previous
+  tables.
+
+```lua
+local utils=require('wgc-nvim-utils').utils
+t = utils.table.merge({one = 1, two = 2}, { two = 'two', three = 3} )
+-- t = {one = 1, two = 'two', three = 3}
 ```
 #### pop()
 Pops last val from table. Returns popped val and new table with last item removed. Original table is untouched.
@@ -212,18 +219,19 @@ Returns a new table that contains all entries from tbl. New table is unmodifiabl
 
 ### Some nvim helpers
 #### make_mapper(opts) -> fn(mode,keys,action)
-Returns a function to to map keys. The opts passed in are concatenated with {noremap =true} and used as the opts to nvim_set_keymap (or nvim_buf_set_keymap if opts contains buffer = \<bufnr\> ) Note: the buffer entry is removed from opts
+Returns a function to to map keys with default opts.
 ```lua
 -- Usual way to map keys
-vim.api.nvim_set_key_map('n','<leader>u','gUiw',{noremap=true, silent=true})
-vim.api.nvim_set_key_map('n','<leader>p','"0p',{noremap=true, silent=true})
+vim.keymap.set('n','<leader>u','gUiw',{noremap=true, silent=true, desc = 'desc 1'})
+vim.keymap.set('n','<leader>p','"0p',{noremap=true, silent=true, desc = 'desc 2'})
 
 --with helper
 local utils = require('wgc-nvim-utils').utils
-local map = utils.make_mapper({silent=true})
+local map = utils.make_mapper({noremap = true, silent=true})
 
-map('n','<leader>u','gUiw')
-map('n','<leader>p','"0p')
+-- Note: any option set here will override any options passed to make_mapper.
+map('n','<leader>u','gUiw', {desc = 'desc 1'})
+map('n','<leader>p','"0p'), {desc = 'desc 2'})
 
 -- Buffer maps example
 local buf_map = utils.make_mapper({silent=true, buffer=0})

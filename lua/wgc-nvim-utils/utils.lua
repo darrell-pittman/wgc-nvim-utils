@@ -1,5 +1,7 @@
 local M = {}
 
+local _iter
+
 local protect = function(tbl)
   return setmetatable({}, {
     __index = tbl,
@@ -8,6 +10,18 @@ local protect = function(tbl)
     end,
     __metatable = 'Not Allowed',
   })
+end
+
+_iter = function(f, tbl1, ...)
+  tbl1 = tbl1 or {}
+  local tbls = { ... }
+  if not tbls or #tbls == 0 then
+    return tbl1
+  end
+  local tbl = tbls[1]
+  tbls = vim.list_slice(tbls, 2, #tbls)
+  tbl1 = f(tbl1, tbl)
+  return _iter(f, tbl1, unpack(tbls))
 end
 
 M.constants = protect({
@@ -44,18 +58,37 @@ end
 M.table = {
   protect = protect,
   pop = pop,
-  append = function(tbl1, ...)
-    local tbls = { ... }
-    if tbls and #tbls > 0 then
-      local tbl = tbls[1]
-      tbls = vim.list_slice(tbls, 2, #tbls)
-      for _, v in ipairs(tbl) do
-	table.insert(tbl1, v)
+
+  is_array = function(tbl)
+    local i = 0
+    for _ in pairs(tbl) do
+      i = i + 1
+      if tbl[i] == nil then
+        return false
       end
-      tbl1 = M.table.append(tbl1, unpack(tbls))
     end
-    return tbl1
+    return true
   end,
+
+  append = function(...)
+    local f = function(dest, src)
+      for _, v in ipairs(src) do
+        table.insert(dest, v)
+      end
+      return dest
+    end
+    return _iter(f, {}, ...)
+  end,
+
+  merge = function(...)
+    local f = function(dest, src)
+      for k, v in pairs(src) do
+        dest[k] = v
+      end
+      return dest
+    end
+    return _iter(f, {}, ...)
+  end
 }
 
 M.t = function(str)
@@ -64,18 +97,10 @@ end
 
 M.make_mapper = function(defaults)
   defaults = defaults or {}
-  defaults['noremap'] = defaults['noremap'] or true
-
 
   return function(mode, lhs, rhs, opts)
-    local options = {}
-    for k,v in pairs(defaults) do
-      options[k] = v
-    end
-    for k, v in pairs(opts) do
-      options[k] = v
-    end
-    vim.keymap.set(mode, lhs, rhs, options )
+    opts = opts or {}
+    vim.keymap.set(mode, lhs, rhs, M.table.merge(defaults, opts))
   end
 end
 

@@ -1,7 +1,7 @@
 local utils = require('wgc-nvim-utils.utils')
 
 local constants = utils.table.protect {
-  SEP = package.config:sub(1,1),
+  SEP = package.config:sub(1, 1),
   DIR_TYPE = 'directory',
   FILE_TYPE = 'file',
 }
@@ -24,7 +24,7 @@ local regexes = utils.table.protect {
 
 local function verify(...)
   local verified = ... and true
-  for _,fp in ipairs{...} do
+  for _, fp in ipairs { ... } do
     verified = verified and getmetatable(fp) == M
   end
   return verified
@@ -35,14 +35,14 @@ local function concat(fp1, fp2)
     if fp2:is_absolute() then
       error('fp2 must be relative')
     end
-    return M:new(utils.table.append({},fp1.path,fp2.path), fp1.root)
+    return M:new(utils.table.append(fp1.path, fp2.path), fp1.root)
   else
     error('Error: file_path can only concat another file_path')
   end
 end
 
 M.__tostring = function(fp)
-  return (fp.root or '')..table.concat(fp.path, constants.SEP)
+  return (fp.root or '') .. table.concat(fp.path, constants.SEP)
 end
 
 M.__add = concat
@@ -51,7 +51,7 @@ M.__concat = concat
 
 local function parse_root(str_path)
   local root
-  for _,regex in ipairs(regexes.ROOTS) do
+  for _, regex in ipairs(regexes.ROOTS) do
     if regex then
       root = str_path:match(regex)
     end
@@ -90,7 +90,7 @@ function M:new(path, root)
     error('Invalid path')
   end
 
-  return setmetatable({path = path, root = root},self)
+  return setmetatable({ path = path, root = root }, self)
 end
 
 function M:parent()
@@ -126,40 +126,40 @@ end
 
 function M:is_directory(success, failure)
   self:exists(function(stat)
-    if stat.type == constants.DIR_TYPE then
-      success()
-    else
-      if failure then failure() end
-    end
-  end,
-  failure)
+      if stat.type == constants.DIR_TYPE then
+        success()
+      else
+        if failure then failure() end
+      end
+    end,
+    failure)
 end
 
 function M:is_file(success, failure)
   self:exists(function(stat)
-    if stat.type == constants.FILE_TYPE then
-      success()
-    else
-      if failure then failure() end
-    end
-  end,
-  failure)
+      if stat.type == constants.FILE_TYPE then
+        success()
+      else
+        if failure then failure() end
+      end
+    end,
+    failure)
 end
 
 function M:search_up(name, callback)
   self:exists(function()
-    local needle = self..name
+    local needle = self .. name
     needle:exists(function()
-      callback(needle)
-    end,
-    function()
-      local path = self:parent()
-      if path then
-        path:search_up(name, callback)
-      else
-        callback()
-      end
-    end)
+        callback(needle)
+      end,
+      function()
+        local path = self:parent()
+        if path then
+          path:search_up(name, callback)
+        else
+          callback()
+        end
+      end)
   end)
 end
 
@@ -180,4 +180,3 @@ function M:read(callback)
 end
 
 return M
-
