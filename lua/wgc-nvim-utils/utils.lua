@@ -15,7 +15,7 @@ end
 _iter = function(f, tbl1, ...)
   tbl1 = tbl1 or {}
   local tbls = { ... }
-  if not tbls or #tbls == 0 then
+  if (not tbls) or #tbls == 0 then
     return tbl1
   end
   local tbl = tbls[1]
