@@ -176,6 +176,30 @@ v = my_cache:get("key") -- v = nil
 ```
 ## utils
 Some utils for string, tables and also helpers for nvim options and key mapping.
+Also has a func submodule which has useful functions
+
+### func submodule
+#### fold_left(f, acc, list)
+Accepts a function f(acc, entry) which takes in acc and entry from the list and
+returns a new value for acc.
+
+fold_left iterates over list and calls acc = f(acc, entry) for each item in 
+list and returns acc when finished;
+
+Example:
+
+```lua
+local func = require('wgc-nvim-utils').utils.func
+local function sum(...)
+  local f = function(acc, n)
+    return acc + n
+  end
+  return func.fold_left(f, 0, {...})
+end
+
+local x = sum(1,4,7)
+print(x) -- prints 12
+```
 
 ### string submodule
 #### is_empty(str) 

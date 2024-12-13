@@ -1,7 +1,5 @@
 local M = {}
 
-local _iter
-
 local protect = function(tbl)
   return setmetatable({}, {
     __index = tbl,
@@ -12,21 +10,20 @@ local protect = function(tbl)
   })
 end
 
-_iter = function(f, tbl1, ...)
-  tbl1 = tbl1 or {}
-  local tbls = { ... }
-  if (not tbls) or #tbls == 0 then
-    return tbl1
-  end
-  local tbl = tbls[1]
-  tbls = vim.list_slice(tbls, 2, #tbls)
-  tbl1 = f(tbl1, tbl)
-  return _iter(f, tbl1, unpack(tbls))
-end
-
 M.constants = protect({
   HOME = vim.env.HOME,
 })
+
+M.func = {
+  fold_left = function(f, acc, list)
+    if (not list) or #list == 0 then
+      return acc
+    end
+    acc = f(acc, list[1])
+    list = vim.list_slice(list, 2, #list)
+    return M.func.fold_left(f, acc, list)
+  end
+}
 
 M.string = {
   center = function(str, width)
@@ -77,7 +74,7 @@ M.table = {
       end
       return dest
     end
-    return _iter(f, {}, ...)
+    return M.func.fold_left(f, {}, { ... })
   end,
 
   merge = function(...)
@@ -87,7 +84,7 @@ M.table = {
       end
       return dest
     end
-    return _iter(f, {}, ...)
+    return M.func.fold_left(f, {}, { ... })
   end
 }
 
