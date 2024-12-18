@@ -114,7 +114,7 @@ function M:extension()
 end
 
 function M:exists(success, failure)
-  vim.loop.fs_stat(tostring(self), function(err, stat)
+  vim.uv.fs_stat(tostring(self), function(err, stat)
     local ok = not err and stat
     if ok then
       success(stat)
@@ -164,14 +164,15 @@ function M:search_up(name, callback)
 end
 
 function M:read(callback)
-  vim.loop.fs_open(tostring(self), 'r', 438, function(err, fd)
+  vim.uv.fs_open(tostring(self), 'r', 438, function(err, fd)
     assert(not err, err)
-    vim.loop.fs_fstat(fd, function(err, stat)
-      assert(not err, err)
-      vim.loop.fs_read(fd, stat.size, 0, function(err, data)
-        assert(not err, err)
-        vim.loop.fs_close(fd, function(err)
-          assert(not err, err)
+    vim.uv.fs_fstat(fd, function(err1, stat)
+      assert(not err1, err1)
+      assert(stat, 'fs_fstat return nil for stat')
+      vim.uv.fs_read(fd, stat.size, 0, function(err2, data)
+        assert(not err2, err2)
+        vim.uv.fs_close(fd, function(err3)
+          assert(not err3, err3)
           callback(data)
         end)
       end)
